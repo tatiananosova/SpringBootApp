@@ -1,6 +1,9 @@
 package com.example.springbootapp.repository;
 
 import com.example.springbootapp.model.Product;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,53 +14,60 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ProductRepository {
-    private final static List<Product> database = new CopyOnWriteArrayList<>();
-    private final static AtomicInteger id = new AtomicInteger();
+    private static SessionFactory factory;
 
     static {
-        database.add(new Product(id.incrementAndGet(), "Potato", 4, 1, false));
-        database.add(new Product(id.incrementAndGet(), "Tomato", 5, 1, false));
-        database.add(new Product(id.incrementAndGet(), "Sweet Potato", 6, 1, false));
-        database.add(new Product(id.incrementAndGet(), "Cucumber", 7, 1, false));
-        database.add(new Product(id.incrementAndGet(), "Radish", 8, 1, false));
-        database.add(new Product(id.incrementAndGet(), "Paper", 9, 1, false));
-        database.add(new Product(id.incrementAndGet(), "Paper Bell", 10, 1, false));
-        database.add(new Product(id.incrementAndGet(), "Horse Radish", 1, 1, false));
-        database.add(new Product(id.incrementAndGet(), "Zucchini", 2, 1, false));
-        database.add(new Product(id.incrementAndGet(), "Pumpkin", 3, 1, false));
+        factory = new Configuration()
+                .configure("hibernate.cfg.xml")
+                .buildSessionFactory();
     }
     public void add(Product product) {
-        product.setId(id.incrementAndGet());
-        database.add(product);
+        try (Session session = factory.getCurrentSession()) {
+            session.beginTransaction();
+            session.save(product);
+            session.getTransaction().commit();
+        }
     }
 
     public Product getProduct(int id) {
-        return database.stream()
-                .filter(product -> product.getId() == id)
-                .findFirst()
-                .orElse(null);
+        Product product = null;
+        try (Session session = factory.getCurrentSession()) {
+            session.beginTransaction();
+            product = session.get(Product.class, id);
+            session.getTransaction().commit();
+        }
+        return product;
     }
+
     public List<Product> findAll() {
-        return database.stream().filter(product -> !product.isDeleted()).collect(Collectors.toUnmodifiableList());
+        List<Product> products;
+        try (Session session = factory.getCurrentSession()) {
+            session.beginTransaction();
+            products = session.createQuery("from Product").getResultList();
+            session.getTransaction().commit();
+        }
+        return products;
     }
 
     public Product update(Product product) {
         if (product.getId() == null) {
             return null;
         }
-        Product existingProduct = database.stream()
-                .filter(it -> it.getId().equals(product.getId()))
-                .findFirst()
-                .orElseThrow(NoSuchElementException::new);
-        product.setId(existingProduct.getId());
-        product.setVersion(existingProduct.getVersion() + 1);
-        database.add(product);
+        try (Session session = factory.getCurrentSession()) {
+            session.beginTransaction();
+            Product product1 = session.get(Product.class, product.getId());
+            product1.setTitle(product.getTitle());
+            product1.setCost(product.getCost());
+            product1.setVersion(product1.getVersion() + 1);
+            product1.setDeleted(product.isDeleted());
+            session.getTransaction().commit();
+        }
         return product;
     }
 
     public int deleteById(Integer id) {
-        List<Product> productsToDelete = database.stream().filter(product -> product.getId().equals(id)).collect(Collectors.toList());
-        productsToDelete.forEach(product -> product.setDeleted(true));
-        return productsToDelete.size();
+        Product product = getProduct(id);
+        product.setDeleted(true);
+        return update(product).getId();
     }
 }

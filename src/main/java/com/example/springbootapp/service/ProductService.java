@@ -28,7 +28,10 @@ public class ProductService {
 
     public List<ProductDto> findAll() {
         log.debug("All products");
-        return productRepository.findAll().stream().map(ProductConverter::productToDto).collect(Collectors.toList());
+        return productRepository.findAll()
+                .stream()
+                .map(ProductConverter::productToDto)
+                .collect(Collectors.toList());
     }
     public ProductDto getProduct(int id) {
         log.debug("Get product");
