@@ -39,7 +39,7 @@ public class ProductRepository {
         List<Product> product;
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            product = session.createQuery("select p from Product p").getResultList();
+            product = session.createQuery("select p from Product p where p.deleted=false ").getResultList();
             session.getTransaction().commit();
         }
         return product;
