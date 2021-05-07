@@ -1,12 +1,14 @@
 package com.example.springbootapp.service;
 
 import com.example.springbootapp.dto.ProductDto;
+import com.example.springbootapp.model.Product;
 import com.example.springbootapp.repository.ProductRepository;
 import com.example.springbootapp.util.ProductConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +30,14 @@ public class ProductService {
 
     public List<ProductDto> findAll() {
         log.debug("All products");
-        return productRepository.findAll()
-                .stream()
-                .map(ProductConverter::productToDto)
-                .collect(Collectors.toList());
+        List<Product> products = productRepository.findAll();
+        List<ProductDto> productDtos = new ArrayList<>();
+        log.debug(products.toString());
+        for (Product p : products) {
+            productDtos.add(ProductConverter.productToDto(p));
+
+        }
+        return productDtos;
     }
     public ProductDto getProduct(int id) {
         log.debug("Get product");

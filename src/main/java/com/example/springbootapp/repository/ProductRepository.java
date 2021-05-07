@@ -7,10 +7,6 @@ import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Repository
 public class ProductRepository {
@@ -40,13 +36,13 @@ public class ProductRepository {
     }
 
     public List<Product> findAll() {
-        List<Product> products;
+        List<Product> product;
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            products = session.createQuery("from Product").getResultList();
+            product = session.createQuery("select p from Product p").getResultList();
             session.getTransaction().commit();
         }
-        return products;
+        return product;
     }
 
     public Product update(Product product) {

@@ -10,7 +10,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "products")
+@Table(name = "product")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +20,8 @@ public class Product {
     private String title;
     @Column(name = "cost")
     private Integer cost;
-    @Column(name = "version")
-    private Integer version;
     @Column(name = "deleted")
     private boolean deleted;
+    @Column(name = "version")
+    private Integer version;
 }
