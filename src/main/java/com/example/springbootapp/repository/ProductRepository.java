@@ -1,22 +1,19 @@
 package com.example.springbootapp.repository;
 
+import com.example.springbootapp.model.Customer;
 import com.example.springbootapp.model.Product;
+import com.example.springbootapp.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class ProductRepository {
-    private static SessionFactory factory;
+    private static final SessionFactory factory = HibernateUtil.getSessionFactory();
 
-    static {
-        factory = new Configuration()
-                .configure("hibernate.cfg.xml")
-                .buildSessionFactory();
-    }
     public void add(Product product) {
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
@@ -65,5 +62,15 @@ public class ProductRepository {
         Product product = getProduct(id);
         product.setDeleted(true);
         return update(product).getId();
+    }
+
+    public List<Customer> getCustomerList(int prodId) {
+        List<Customer> customers;
+        try (Session session = factory.getCurrentSession()) {
+            session.beginTransaction();
+            customers = new ArrayList<>(session.get(Product.class, prodId).getCustomerList());
+            session.getTransaction().commit();
+        }
+        return customers;
     }
 }
