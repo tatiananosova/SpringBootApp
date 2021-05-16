@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public class ProductConverter {
 
     public static Product dtoToProduct(ProductDto productDto) {
-        return new Product(productDto.getId(), productDto.getTitle(), productDto.getCost(), 1, false);
+        return new Product(productDto.getId(), productDto.getTitle(), productDto.getCost(), false, 1);
     }
 
     public static ProductDto productToDto(Product product) {
