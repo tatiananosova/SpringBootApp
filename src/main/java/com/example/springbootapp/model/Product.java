@@ -1,13 +1,15 @@
 package com.example.springbootapp.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = "customerList")
+@EqualsAndHashCode(exclude = "customerList")
+@AllArgsConstructor()
 @NoArgsConstructor
 @Entity
 @Table(name = "product")
@@ -24,4 +26,12 @@ public class Product {
     private boolean deleted;
     @Column(name = "version")
     private Integer version;
+
+    @ManyToMany
+    @JoinTable(
+            name = "customer_product",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id")
+    )
+    private List<Customer> customerList;
 }

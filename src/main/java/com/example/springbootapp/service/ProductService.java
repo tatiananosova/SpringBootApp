@@ -1,8 +1,11 @@
 package com.example.springbootapp.service;
 
+import com.example.springbootapp.dto.CustomerDto;
 import com.example.springbootapp.dto.ProductDto;
 import com.example.springbootapp.model.Product;
+import com.example.springbootapp.repository.CustomerRepository;
 import com.example.springbootapp.repository.ProductRepository;
+import com.example.springbootapp.util.CustomerConverter;
 import com.example.springbootapp.util.ProductConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
 @Log4j2
 public class ProductService {
     private final ProductRepository productRepository;
+
+    private final CustomerRepository customerRepository;
 
     public void save(ProductDto product) {
         if (product.getId() == null) {
@@ -46,5 +51,12 @@ public class ProductService {
 
     public void deleteById(Integer id) {
         productRepository.deleteById(id);
+    }
+
+    public List<ProductDto> getCustomerProducts(int custId){
+        return customerRepository.getProductList(custId).stream().map(ProductConverter::productToDto).collect(Collectors.toList());
+    }
+    public List<CustomerDto> getProductCustomers(int prodId){
+        return productRepository.getCustomerList(prodId).stream().map(CustomerConverter::customerToDto).collect(Collectors.toList());
     }
 }

@@ -14,5 +14,6 @@
         <property name="current_session_context_class">thread</property>
 
         <mapping class="com.example.springbootapp.model.Product"/>
+        <mapping class="com.example.springbootapp.model.Customer"/>
     </session-factory>
 </hibernate-configuration>
